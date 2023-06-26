@@ -3,7 +3,7 @@
     "displayName": "Ametrin AutoRegistry",
     "version": "0.1.0",
     "unity": "2022.2",
-    "description": "Automated Registry for Unity",
+    "description": "Various Utilities for Unity",
     "license": "MIT",
     "author": {
         "name": "Barion",
@@ -11,10 +11,10 @@
         "url": "https://github.com/BarionLP"
     },
     "bugs": {
-        "url": "https://github.com/BarionLP/UnityAutoRegistry/issues"
+        "url": "https://github.com/BarionLP/UnityUtils/issues"
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/BarionLP/UnityAutoRegistry.git"
+        "url": "https://github.com/BarionLP/UnityUtils.git"
     }
 }

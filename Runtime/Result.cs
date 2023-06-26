@@ -23,54 +23,46 @@ namespace Ametrin.Utils{
             return new(status);
         }
 
-        public bool TryGet(out T value){
-            value = Value!;
-            return !HasFailed();
+        public void Resolve(Action<T> success, Action<ResultStatus>? failed = null) {
+            if(!HasFailed()) {
+                success(Value!);
+                return;
+            }
+
+            if(failed is not null) {
+                failed(Status);
+            }
         }
 
-        public T Get(){
-            return Value!;
-        }
+        public T Get() => Value!;
+        public bool HasFailed() => Status.HasFlag(ResultStatus.Failed);
 
-        public bool HasFailed()
-        {
-            return Status.HasFlag(ResultStatus.Failed);
-        }
-
-        public static implicit operator T(Result<T> result){
-            if (result.HasFailed()) throw new ArgumentNullException(nameof(result), "Result has failed, validate your results!");
-
-            return result.Get();
-        }
-        public static implicit operator Result<T>(ResultStatus status){
-            return Result<T>.Failed(status);
-        }
-
+        public static implicit operator Result<T>(ResultStatus status) => Result<T>.Failed(status);
         public static implicit operator Result<T>(T value){
             if(value is null) return Result<T>.Failed(ResultStatus.ResultNull);
             return Result<T>.Succeeded(value);
         }
     }
 
-    public sealed class Result
-    {
+    public sealed class Result    {
         public readonly ResultStatus Status = ResultStatus.Failed;
 
         private Result(ResultStatus status){
             Status = status;
         }
 
-        public bool HasFailed(){
-            return Status.HasFlag(ResultStatus.Failed);
+        public void Resolve(Action success, Action<ResultStatus> failed) {
+            if(HasFailed()) {
+                failed(Status);
+                return;
+            }
+
+            success();
         }
 
-        public static Result Of(ResultStatus status){
-            return new(status);
-        }
-
-        public static implicit operator Result(ResultStatus status){
-            return Of(status);
-        }
+        public bool HasFailed() => Status.HasFlag(ResultStatus.Failed);
+        public static Result Of(ResultStatus status) => new(status);
+        public static implicit operator Result(ResultStatus status) =>  Of(status);
     }
 
     [Flags] //for fails first bit must be 1

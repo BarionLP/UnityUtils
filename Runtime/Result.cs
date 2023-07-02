@@ -23,15 +23,29 @@ namespace Ametrin.Utils{
             return new(status);
         }
 
-        public void Resolve(Action<T> success, Action<ResultStatus>? failed = null) {
-            if(!HasFailed()) {
-                success(Value!);
+        public void Resolve(Action<T> success, Action<ResultStatus>? failed = null){
+            if (HasFailed()){
+                failed?.Invoke(Status);
                 return;
             }
 
-            if(failed is not null) {
-                failed(Status);
+            success(Value!);
+            return;
+        }
+
+        public TReturn Resolve<TReturn>(Func<T, TReturn> success, Func<ResultStatus, TReturn> failed){
+            if (HasFailed()){
+                return failed(Status);
             }
+
+            return success(Value!);
+        }
+
+        public TReturn Resolve<TReturn>(Func<T, TReturn> success, TReturn @default){
+            if (HasFailed()){
+                return @default;
+            }
+            return success(Value!);
         }
 
         public T Get() => Value!;
@@ -51,13 +65,29 @@ namespace Ametrin.Utils{
             Status = status;
         }
 
-        public void Resolve(Action success, Action<ResultStatus> failed) {
-            if(HasFailed()) {
-                failed(Status);
+        public void Resolve(Action success, Action<ResultStatus>? failed = null){
+            if (HasFailed()){
+                failed?.Invoke(Status);
                 return;
             }
 
             success();
+        }
+
+        public TReturn Resolve<TReturn>(Func<TReturn> success, Func<ResultStatus, TReturn> failed){
+            if (HasFailed()){
+                return failed(Status);
+            }
+
+            return success();
+        }
+
+        public TReturn Resolve<TReturn>(Func<TReturn> success, TReturn @default){
+            if (HasFailed()){
+                return @default;
+            }
+
+            return success();
         }
 
         public bool HasFailed() => Status.HasFlag(ResultStatus.Failed);

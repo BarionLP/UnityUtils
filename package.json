@@ -1,7 +1,7 @@
 {
     "name": "com.ametrin.utils",
     "displayName": "Ametrin Unity Utils",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "unity": "2022.3",
     "description": "Various Utilities for Unity",
     "license": "MIT",

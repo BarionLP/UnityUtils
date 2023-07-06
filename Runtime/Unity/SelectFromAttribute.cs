@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace Ametrin.UnityUtils{
+namespace Ametrin.Utils.Unity{
 
     // TODO: make generic when Unity updates C#
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]

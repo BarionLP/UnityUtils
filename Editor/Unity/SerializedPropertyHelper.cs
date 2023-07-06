@@ -1,7 +1,7 @@
 using System.Linq;
 using UnityEditor;
 
-namespace Ametrin.UnityUtils.EditorTools{
+namespace Ametrin.Utils.Unity.EditorTools{
 
     public static class SerializedPropertyHelper{
         private static readonly string[] IgnorableSubProperties = new string[] { "m_Script" };
@@ -17,7 +17,7 @@ namespace Ametrin.UnityUtils.EditorTools{
             return false;
         }
 
-        public static bool IsOnBlacklist(this SerializedProperty property){
+        public static bool CanBeIgnored(this SerializedProperty property){
             return IgnorableSubProperties.Contains(property.name);
         }
     }

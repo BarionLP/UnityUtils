@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace Ametrin.UnityUtils.EditorTools{
+namespace Ametrin.Utils.Unity.EditorTools{
 
     [CustomPropertyDrawer(typeof(SelectFromAttribute))]
     public sealed class SelectFromAttributeDrawer : PropertyDrawer{

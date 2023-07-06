@@ -2,7 +2,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace Ametrin.UnityUtils.EditorTools{
+namespace Ametrin.Utils.Unity.EditorTools{
     [CustomPropertyDrawer(typeof(InlineEditorAttribute), true)]
     public sealed class InlineEditorAttributeDrawer : PropertyDrawer{
         private const int FOLDOUT_WIDTH = 16;
@@ -36,7 +36,7 @@ namespace Ametrin.UnityUtils.EditorTools{
             using var iterator = serializedData.GetIterator();
             iterator.NextVisible(true);
             do{
-                if(iterator.IsOnBlacklist()) continue;
+                if(iterator.CanBeIgnored()) continue;
                 var height = EditorGUI.GetPropertyHeight(iterator, new GUIContent(iterator.displayName), true);
                 EditorGUI.PropertyField(new Rect(position.x, y, position.width, height), iterator, true);
                 y += height + EditorGUIUtility.standardVerticalSpacing;
@@ -63,7 +63,7 @@ namespace Ametrin.UnityUtils.EditorTools{
                 using var iterator = serializedObject.GetIterator();
                 iterator.NextVisible(true);
                 do{
-                    if(iterator.IsOnBlacklist()) continue;
+                    if(iterator.CanBeIgnored()) continue;
                     float height = EditorGUI.GetPropertyHeight(iterator, label, true) + EditorGUIUtility.standardVerticalSpacing;
                     totalHeight += height;
                 }

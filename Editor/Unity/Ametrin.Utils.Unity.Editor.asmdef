@@ -1,11 +1,13 @@
 {
-    "name": "Ametrin.Utils.EditorTools",
+    "name": "Ametrin.Utils.Unity.Editor",
     "rootNamespace": "",
     "references": [
-        "GUID:1dcc606ed8b26b847b2cefc1750b72ce"
+        "GUID:714d6244ba694be40ae52c3e02ccc444"
     ],
     "includePlatforms": [],
-    "excludePlatforms": [],
+    "excludePlatforms": [
+        "Editor"
+    ],
     "allowUnsafeCode": false,
     "overrideReferences": false,
     "precompiledReferences": [],

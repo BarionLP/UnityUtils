@@ -10,10 +10,7 @@ namespace Ametrin.Utils.Unity{
         public readonly Type Type;
         public readonly bool AllowRawInput;
         
-        public SelectFromAttribute(Type type, params object[] values) : 
-        this(type, false, values){
-            
-        }
+        public SelectFromAttribute(Type type, params object[] values) : this(type, false, values){}
         
         public SelectFromAttribute(Type type, bool allowRawInput, params object[] values){
             Type = type;

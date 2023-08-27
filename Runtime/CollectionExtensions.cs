@@ -34,5 +34,8 @@ namespace Ametrin.Utils{
                 collection.Add(item);
             }
         }
+
+        public static bool StartsWith<T>(this ReadOnlySpan<T> span, T value) => span[0].Equals(value);
+        public static bool StartsWith<T>(this ICollection<T> collection, T value) => collection.ElementAt(0).Equals(value);
     }
 }

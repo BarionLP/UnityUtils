@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace Ametrin.Utils{
@@ -14,6 +15,14 @@ namespace Ametrin.Utils{
 
         public static string AsIntFriendly(this string input) {
             return Regex.Replace(input, "\\D", "");
+        }
+
+        public static bool StartsWith(this string str, ReadOnlySpan<char> value){
+            if (str == null || value.Length > str.Length){
+                return false;
+            }
+
+            return str.AsSpan()[..value.Length].SequenceEqual(value);
         }
     }
 }

@@ -1,4 +1,4 @@
-namespace Ametrin.Utils.Unity{
+namespace Ametrin.Utils{
     public readonly struct ValueChangedEventArgs<T>{
         public readonly T Old;
         public readonly T New;

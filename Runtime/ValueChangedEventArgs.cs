@@ -1,9 +1,11 @@
-public readonly ref struct ValueChangedEventArgs<T>{
-    public readonly T Old;
-    public readonly T New;
+namespace Ametrin.Utils.Unity{
+    public readonly struct ValueChangedEventArgs<T>{
+        public readonly T Old;
+        public readonly T New;
 
-    public ValueChangedEventArgs(T old, T @new){
-        Old = old;
-        New = @new;
+        public ValueChangedEventArgs(T old, T @new){
+            Old = old;
+            New = @new;
+        }
     }
 }

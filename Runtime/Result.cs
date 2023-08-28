@@ -52,10 +52,6 @@ namespace Ametrin.Utils{
         public T? GetOrDefault() => Value ?? default;
         public T GetOrDefault(T @default) => Value ?? @default;
         public bool HasFailed() => Status.HasFlag(ResultStatus.Failed);
-        public bool HasFailed(out T result){
-            result = Value!;
-            return HasFailed();
-        }
 
         public static implicit operator Result<T>(ResultStatus status) => Result<T>.Failed(status);
         public static implicit operator Result<T>(T? value) => value is null ? Result<T>.Failed(ResultStatus.Null) : Result<T>.Succeeded(value);

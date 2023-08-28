@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Ametrin.Utils {
     public static class CharSpanExtensions {
-        public static IReadOnlyList<Range> Split(this ReadOnlySpan<char> span, char delimiter) {
+        public static IList<Range> Split(this ReadOnlySpan<char> span, char delimiter) {
             int start = 0;
             var result = new List<Range>();
             for(int i = 0; i < span.Length; i++) {

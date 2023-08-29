@@ -1,12 +1,9 @@
-using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
 namespace Ametrin.Utils.Unity.EditorTools{
     [CustomPropertyDrawer(typeof(InlineEditorAttribute), true)]
     public sealed class InlineEditorAttributeDrawer : PropertyDrawer{
-        private const int FOLDOUT_WIDTH = 16;
-        private Editor cachedEditor;
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label){
             EditorGUI.BeginProperty(position, label, property);
@@ -24,8 +21,6 @@ namespace Ametrin.Utils.Unity.EditorTools{
                 EditorGUI.EndProperty();
                 return;
             }
-
-            // GUI.Box(new Rect(0, position.y + EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing - 1, Screen.width, position.height - EditorGUIUtility.singleLineHeight - EditorGUIUtility.standardVerticalSpacing), "");
 
             EditorGUI.indentLevel++;
             EditorGUI.BeginChangeCheck();

@@ -1,8 +1,7 @@
 ﻿using System;
 
-namespace Ametrin.Utils
-{
-    public class OneOf<T1, T2>
+namespace Ametrin.Utils{
+    public sealed class OneOf<T1, T2>
     {
         private readonly object Value;
 
@@ -46,7 +45,7 @@ namespace Ametrin.Utils
         public static implicit operator OneOf<T1, T2>(T2 t2) => new(t2);
     }
 
-    public class OneOf<T1, T2, T3>
+    public sealed class OneOf<T1, T2, T3>
     {
         private readonly object Value;
 

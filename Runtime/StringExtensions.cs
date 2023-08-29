@@ -18,11 +18,11 @@ namespace Ametrin.Utils{
         }
 
         public static bool StartsWith(this string str, ReadOnlySpan<char> value){
-            if (str == null || value.Length > str.Length){
+            if (value.Length > str.Length){
                 return false;
             }
 
-            return str.AsSpan()[..value.Length].SequenceEqual(value);
+            return str.AsSpan(0, value.Length).SequenceEqual(value);
         }
     }
 }

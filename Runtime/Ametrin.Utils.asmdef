@@ -1,6 +1,6 @@
 {
     "name": "Ametrin.Utils",
-    "rootNamespace": "",
+    "rootNamespace": "Ametrin.Utils",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],

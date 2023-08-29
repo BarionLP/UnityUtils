@@ -1,5 +1,5 @@
 {
-    "name": "Ametrin.Utils.Unity.Editor",
+    "name": "Ametrin.Utils.Unity.EditorTools",
     "rootNamespace": "Ametrin.Utils.Unity.EditorTools",
     "references": [
         "GUID:714d6244ba694be40ae52c3e02ccc444"

@@ -15,5 +15,28 @@ namespace Ametrin.Utils{
             result = default!;
             return false;
         }
+
+        public static TValue GetOrCreate<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, TValue @default){
+            if (dictionary.TryGetValue(key, out var value)) return value;
+
+            dictionary.Add(key, @default);
+            return @default;
+        }
+        public static TValue GetOrCreate<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key) where TValue : new(){
+            if (!dict.TryGetValue(key, out TValue val)){
+                val = new TValue();
+                dict.Add(key, val);
+            }
+
+            return val;
+        }
+        public static TValue GetOrCreate<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, Func<TValue> valueFactory){
+            if (!dictionary.TryGetValue(key, out var value)){
+                value = valueFactory();
+                dictionary.Add(key, value);
+            }
+
+            return value;
+        }
     }
 }

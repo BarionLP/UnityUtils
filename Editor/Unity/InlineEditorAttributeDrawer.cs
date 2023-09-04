@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -7,73 +6,92 @@ using UnityEngine.UIElements;
 namespace Ametrin.Utils.Unity.EditorTools{
     [CustomPropertyDrawer(typeof(InlineEditorAttribute), true)]
     public sealed class InlineEditorAttributeDrawer : PropertyDrawer{
-        private readonly static Dictionary<string, bool> IsFoldoutOpen = new();
         private readonly static StyleColor BackgroundColor = new Color(0, 0, 0, 0.1f);
         private readonly static StyleColor CollapsedBackgroundColor = new Color(0, 0, 0, 0);
+
+        private VisualElement Root;
+        private PropertyField PropertyField;
+        private Foldout EditorFoldout;
+        private VisualElement InlinedEditor;
+        private SerializedProperty Property;
         
         public override VisualElement CreatePropertyGUI(SerializedProperty property){
-            var root = new VisualElement();
-            root.style.BorderRadius(5);
-            root.style.paddingBottom = EditorGUIUtility.standardVerticalSpacing;
+            Property = property;
+            Root = new VisualElement();
+            Root.style.BorderRadius(5);
+            Root.style.paddingBottom = EditorGUIUtility.standardVerticalSpacing;
 
-            root.Add(CreateFoldout(property.propertyPath, root));            
-            root.Add(CreatePropertyField(property, root));
+            CreateFoldout();            
+            CreatePropertyField();
 
-            RefreshUI(root, property);
+            RefreshUI();
 
-            return root;
+            return Root;
         }
 
-        private static Foldout CreateFoldout(string key, VisualElement root){
-            var foldout = new Foldout{
-                value = IsFoldoutOpen.GetOrCreate(key, false)
+        private void CreateFoldout(){
+            EditorFoldout = new(){
+                value = false
             };
-            foldout.RegisterValueChangedCallback(@event =>{
-                IsFoldoutOpen[key] = @event.newValue;
-                UpdateRootColor(root, @event.newValue);
-            });
-            var imGUIContainer = new IMGUIContainer();
-            imGUIContainer.style.marginBottom = EditorGUIUtility.standardVerticalSpacing;
-            foldout.Add(imGUIContainer);
-            UpdateRootColor(root, foldout.value);
-            return foldout;
+            EditorFoldout.RegisterValueChangedCallback(OnFoldoutChanged);
+            EditorFoldout.style.paddingBottom = EditorGUIUtility.standardVerticalSpacing;
+            UpdateRootColor(EditorFoldout.value);
+            Root.Add(EditorFoldout);
         }
 
-        private static PropertyField CreatePropertyField(SerializedProperty property, VisualElement root){
-            var propertyField = new PropertyField(property);
-            propertyField.style.alignContent = Align.Center;
-            propertyField.style.top = 0;
-            propertyField.style.right = 0;
-            propertyField.RegisterValueChangeCallback(evt =>{
-                RefreshUI(root, property);
+        private void CreatePropertyField(){
+            PropertyField = new(Property);
+            PropertyField.style.alignContent = Align.Center;
+            PropertyField.style.top = 0;
+            PropertyField.style.right = 0;
+            PropertyField.RegisterValueChangeCallback(evt =>{
+                RefreshUI();
             });
-            return propertyField;
+            Root.Add(PropertyField);
         }
 
-        private static void RefreshUI(VisualElement root, SerializedProperty property){
-            var propertyField = root.Q<PropertyField>();
-            var foldout = root.Q<Foldout>();
-            var imGUIContainer = foldout.Q<IMGUIContainer>();
-
-            var obj = property.objectReferenceValue;
-            if (obj != null){
-                var editor = Editor.CreateEditor(obj);
-                imGUIContainer.onGUIHandler = editor.OnInspectorGUI;
-                propertyField.style.position = Position.Absolute;
-                propertyField.style.left = 15;
-                foldout.SetEnabled(true);
-                foldout.style.display = DisplayStyle.Flex;
+        private void RefreshUI(){
+            var obj = Property.objectReferenceValue;
+            if(obj != null){
+                PropertyField.style.position = Position.Absolute;
+                PropertyField.style.left = 15;
+                EditorFoldout.SetEnabled(true);
+                EditorFoldout.style.display = DisplayStyle.Flex;
             }else{
-                foldout.style.display = DisplayStyle.None;
-                foldout.SetEnabled(false);
-                propertyField.style.position = Position.Relative;
-                propertyField.style.left = 0;
-                root.style.backgroundColor = CollapsedBackgroundColor;
+                EditorFoldout.Clear();
+                EditorFoldout.style.display = DisplayStyle.None;
+                EditorFoldout.SetEnabled(false);
+                PropertyField.style.position = Position.Relative;
+                PropertyField.style.left = 0;
+                Root.style.backgroundColor = CollapsedBackgroundColor;
             }
         }
 
-        private static void UpdateRootColor(VisualElement root, bool foldoutExpanded){
-            root.style.backgroundColor = foldoutExpanded ? BackgroundColor : CollapsedBackgroundColor;
+        private void BuildEditor(){
+            var editor = Editor.CreateEditor(Property.objectReferenceValue);
+            var rootier = Root.GetFirstAncestorOfType<Foldout>()?.GetFirstAncestorOfType<Foldout>();
+            if(rootier == null){
+                InlinedEditor = editor.CreateInspectorGUI();
+                InlinedEditor.Bind(new(Property.objectReferenceValue));
+            } else{
+                var imGUIContainer = new IMGUIContainer(editor.OnInspectorGUI);
+                InlinedEditor = imGUIContainer;
+            }
+
+            EditorFoldout.Add(InlinedEditor);
+        }
+
+        private void OnFoldoutChanged(ChangeEvent<bool> evt){
+            evt.StopImmediatePropagation();
+            if(InlinedEditor == null && Root.parent != null){
+                BuildEditor();
+            }
+            
+            UpdateRootColor(evt.newValue);
+        }
+
+        private void UpdateRootColor(bool foldoutExpanded){
+            Root.style.backgroundColor = foldoutExpanded ? BackgroundColor : CollapsedBackgroundColor;
         }
 
         //for nested editors

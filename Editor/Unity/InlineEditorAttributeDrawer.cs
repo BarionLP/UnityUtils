@@ -35,7 +35,7 @@ namespace Ametrin.Utils.Unity.EditorTools{
             };
             EditorFoldout.RegisterValueChangedCallback(OnFoldoutChanged);
             EditorFoldout.style.paddingBottom = EditorGUIUtility.standardVerticalSpacing;
-            UpdateRootColor(EditorFoldout.value);
+            UpdateRootColor();
             Root.Add(EditorFoldout);
         }
 
@@ -45,6 +45,7 @@ namespace Ametrin.Utils.Unity.EditorTools{
             PropertyField.style.top = 0;
             PropertyField.style.right = 0;
             PropertyField.RegisterValueChangeCallback(evt =>{
+                evt.StopImmediatePropagation();
                 RefreshUI();
             });
             Root.Add(PropertyField);
@@ -87,11 +88,11 @@ namespace Ametrin.Utils.Unity.EditorTools{
                 BuildEditor();
             }
             
-            UpdateRootColor(evt.newValue);
+            UpdateRootColor();
         }
 
-        private void UpdateRootColor(bool foldoutExpanded){
-            Root.style.backgroundColor = foldoutExpanded ? BackgroundColor : CollapsedBackgroundColor;
+        private void UpdateRootColor(){
+            Root.style.backgroundColor = EditorFoldout.value ? BackgroundColor : CollapsedBackgroundColor;
         }
 
         //IMGUI compat, used when nesting to deep

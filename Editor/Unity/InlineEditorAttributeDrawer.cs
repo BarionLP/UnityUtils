@@ -94,7 +94,7 @@ namespace Ametrin.Utils.Unity.EditorTools{
             Root.style.backgroundColor = foldoutExpanded ? BackgroundColor : CollapsedBackgroundColor;
         }
 
-        //for nested editors
+        //IMGUI compat, used when nesting to deep
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label){
             EditorGUI.BeginProperty(position, label, property);
             EditorGUI.PropertyField(position, property, label);

@@ -19,7 +19,7 @@ namespace Ametrin.Utils.Registry{
             if (Entries.TryGetValue(key, out var value)){
                 return value;
             }
-            return ResultStatus.Null;
+            return ResultFlag.Null;
         }
 
         public IEnumerator<TValue> GetEnumerator() => Entries.Values.GetEnumerator();

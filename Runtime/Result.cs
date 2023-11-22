@@ -1,30 +1,31 @@
 ﻿using System;
 
 namespace Ametrin.Utils{
-#nullable enable
-    public sealed class Result<T>{
-        public readonly ResultStatus Status = ResultStatus.Failed;
-        private T? Value { get; } = default;
+    #nullable enable 
+    public readonly struct Result<T>{
 
-        private Result(ResultStatus status){
+        public  ResultFlag Status { get; }
+        private T? Value { get; }
+
+        public Result(ResultFlag status, T? value){
             Status = status;
-        }
-        private Result(T? value) : this(ResultStatus.Succeeded){
             Value = value;
         }
 
-        public static Result<T> Succeeded(in T value){
-            if (value is null) throw new ArgumentNullException(nameof(value), "Cannot succeed when result is null");
-            return new Result<T>(value);
+        public static Result<T> Of(T value){
+            if (value is null) return Failed(ResultFlag.Null);
+            return new(ResultFlag.Succeeded, value);
+        }
+        public static Result<T> Failed(ResultFlag status = ResultFlag.Failed){
+            if (status is ResultFlag.Succeeded) throw new ArgumentException("Cannot Succeed without value! Use Result.Succeeded", nameof(status));
+            return new(status, default);
         }
 
-        public static Result<T> Failed(ResultStatus status = ResultStatus.Failed){
-            if (status is ResultStatus.Succeeded) throw new ArgumentException("Cannot Succeed without value! Use Result.Succeeded", nameof(status));
-            return new(status);
-        }
+        public readonly bool HasFailed => Status.HasFlag(ResultFlag.Failed);
+        public readonly bool IsSuccess => Status is ResultFlag.Succeeded;
 
-        public void Resolve(Action<T> success, Action<ResultStatus>? failed = null){
-            if (HasFailed()){
+        public readonly void Resolve(Action<T> success, Action<ResultFlag>? failed = null){
+            if (HasFailed){
                 failed?.Invoke(Status);
                 return;
             }
@@ -32,43 +33,67 @@ namespace Ametrin.Utils{
             success(Value!);
         }
 
+        // [Obsolete] //still need it when can't use lambda (e.g. Spans)
         public bool TryResolve(out T result){
             result = Value!;
-            return !HasFailed();
+            return !HasFailed;
         }
 
-        public TReturn Resolve<TReturn>(Func<T, TReturn> success, Func<ResultStatus, TReturn> failed) => HasFailed() ? failed(Status) : success(Value!);
-        public TReturn Resolve<TReturn>(Func<T, TReturn> success, TReturn @default) => HasFailed() ? @default : success(Value!);
-        public Result<TReturn> IfPresent<TReturn>(Func<T, TReturn> operation) => HasFailed() ? Result<TReturn>.Failed(Status) : (Result<TReturn>)operation(Value!);
-        public void Catch(Action<ResultStatus> operation){
-            if(HasFailed()) operation(Status);
+        public readonly Result<TResult> Map<TResult>(Func<T, TResult> map) where TResult : class{
+            return HasFailed ? Result<TResult>.Failed(Status) : map(Value!);
+        }
+        public readonly Result<TResult> Map<TResult>(Func<T, Result<TResult>> map) where TResult : class{
+            return HasFailed ? Result<TResult>.Failed(Status) : map(Value!);
+        }
+        public readonly Result<TResult> Map<TResult>(Func<T, TResult> map, Func<ResultFlag, TResult> error) where TResult : class
+        {
+            return HasFailed ? error(Status) : map(Value!);
         }
 
-        public T Get(){
+        [Obsolete] public TReturn Resolve<TReturn>(Func<T, TReturn> success, Func<ResultFlag, TReturn> failed) => HasFailed ? failed(Status) : success(Value!);
+        [Obsolete] public TReturn Resolve<TReturn>(Func<T, TReturn> success, TReturn @default) => HasFailed ? @default : success(Value!);
+        [Obsolete] public Result<TReturn> IfPresent<TReturn>(Func<T, TReturn> operation) where TReturn : class => HasFailed ? Result<TReturn>.Failed(Status) : operation(Value!);
+
+        [Obsolete]
+        public void Catch(Action<ResultFlag> operation)
+        {
+            if (HasFailed) operation(Status);
+        }
+
+        [Obsolete]
+        public T Get()
+        {
             if (Value is null) throw new NullReferenceException("Trying to read a failed result! Validate or use GetOrDefault");
             return Value;
         }
 
-        public T? GetOrDefault() => Value ?? default;
-        public T GetOrDefault(T @default) => Value ?? @default;
-        public bool HasFailed() => Status.HasFlag(ResultStatus.Failed);
-
-        public static implicit operator Result<T>(ResultStatus status) => Result<T>.Failed(status);
-        public static implicit operator Result<T>(T? value) => value is null ? Result<T>.Failed(ResultStatus.Null) : Result<T>.Succeeded(value);
+        public T Reduce(Func<ResultFlag, T> operation) => IsSuccess ? Value! : operation(Status);
+        public T Reduce(Func<T> operation) => IsSuccess ? Value! : operation();
+        public T Reduce(T @default) => IsSuccess ? Value! : @default;
+        public T? ReduceOrNull() => IsSuccess ? Value : default;
+        public T ReduceOrThrow() => IsSuccess ? Value! : throw new NullReferenceException($"Result was empty: {Status}");        
+        
+        public static implicit operator Result<T>(ResultFlag status) => Result<T>.Failed(status);
+        public static implicit operator Result<T>(T value) => Result<T>.Of(value);
     }
 
-    public sealed class Result{
-        public readonly ResultStatus Status = ResultStatus.Failed;
+    [Obsolete] //will be replaced by StatusFlags with extension methods
+    public sealed class Result
+    {
+        public readonly ResultFlag Status = ResultFlag.Failed;
 
-        private Result(ResultStatus status){
+        private Result(ResultFlag status)
+        {
             Status = status;
         }
 
-        public bool HasFailed() => Status.HasFlag(ResultStatus.Failed);
-        public bool IsSuccess() => Status is ResultStatus.Succeeded;
+        public bool HasFailed() => Status.HasFlag(ResultFlag.Failed);
+        public bool IsSuccess() => Status is ResultFlag.Succeeded;
 
-        public void Resolve(Action success, Action<ResultStatus>? failed = null)        {
-            if (HasFailed())            {
+        public void Resolve(Action success, Action<ResultFlag>? failed = null)
+        {
+            if (HasFailed())
+            {
                 failed?.Invoke(Status);
                 return;
             }
@@ -76,18 +101,22 @@ namespace Ametrin.Utils{
             success();
         }
 
-        public TReturn Resolve<TReturn>(Func<TReturn> success, Func<ResultStatus, TReturn> failed) => HasFailed() ? failed(Status) : success();
+        public TReturn Resolve<TReturn>(Func<TReturn> success, Func<ResultFlag, TReturn> failed) => HasFailed() ? failed(Status) : success();
         public TReturn Resolve<TReturn>(Func<TReturn> success, TReturn @default) => HasFailed() ? @default : success();
-        public void Catch(Action<ResultStatus> operation){
+        public bool Catch(Action<ResultFlag> operation)
+        {
             if (HasFailed()) operation(Status);
+            return HasFailed();
         }
 
-        public static Result Of(ResultStatus status) => new(status);
-        public static implicit operator Result(ResultStatus status) => Of(status);
+        public static Result Of(ResultFlag status) => new(status);
+        public static Result<T> Of<T>(T value) where T : class => Result<T>.Of(value);
+        public static implicit operator Result(ResultFlag status) => Of(status);
     }
+    #nullable disable
 
     [Flags] //for fails first bit must be 1
-    public enum ResultStatus{
+    public enum ResultFlag{
         Succeeded = 0b0000000000000000000000000000000,
         Failed = 0b1000000000000000000000000000000,
         InvalidArgument = 0b1000000000000000000000000000001,
@@ -102,5 +131,6 @@ namespace Ametrin.Utils{
         PathNotFound = IOError | Null,
         PathAlreadyExists = IOError | AlreadyExists,
         NoInternet = WebError | ConnectionFailed,
+        InvalidFile = IOError | InvalidArgument,
     }
 }

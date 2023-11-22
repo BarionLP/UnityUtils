@@ -50,23 +50,6 @@ namespace Ametrin.Utils{
             return HasFailed ? error(Status) : map(Value!);
         }
 
-        [Obsolete] public TReturn Resolve<TReturn>(Func<T, TReturn> success, Func<ResultFlag, TReturn> failed) => HasFailed ? failed(Status) : success(Value!);
-        [Obsolete] public TReturn Resolve<TReturn>(Func<T, TReturn> success, TReturn @default) => HasFailed ? @default : success(Value!);
-        [Obsolete] public Result<TReturn> IfPresent<TReturn>(Func<T, TReturn> operation) where TReturn : class => HasFailed ? Result<TReturn>.Failed(Status) : operation(Value!);
-
-        [Obsolete]
-        public void Catch(Action<ResultFlag> operation)
-        {
-            if (HasFailed) operation(Status);
-        }
-
-        [Obsolete]
-        public T Get()
-        {
-            if (Value is null) throw new NullReferenceException("Trying to read a failed result! Validate or use GetOrDefault");
-            return Value;
-        }
-
         public T Reduce(Func<ResultFlag, T> operation) => IsSuccess ? Value! : operation(Status);
         public T Reduce(Func<T> operation) => IsSuccess ? Value! : operation();
         public T Reduce(T @default) => IsSuccess ? Value! : @default;
@@ -77,9 +60,8 @@ namespace Ametrin.Utils{
         public static implicit operator Result<T>(T value) => Result<T>.Of(value);
     }
 
-    [Obsolete] //will be replaced by StatusFlags with extension methods
-    public sealed class Result
-    {
+    // [Obsolete] //will be replaced by StatusFlags with extension methods
+    public sealed class Result{
         public readonly ResultFlag Status = ResultFlag.Failed;
 
         private Result(ResultFlag status)
@@ -90,10 +72,8 @@ namespace Ametrin.Utils{
         public bool HasFailed() => Status.HasFlag(ResultFlag.Failed);
         public bool IsSuccess() => Status is ResultFlag.Succeeded;
 
-        public void Resolve(Action success, Action<ResultFlag>? failed = null)
-        {
-            if (HasFailed())
-            {
+        public void Resolve(Action success, Action<ResultFlag>? failed = null){
+            if (HasFailed()){
                 failed?.Invoke(Status);
                 return;
             }
@@ -103,8 +83,7 @@ namespace Ametrin.Utils{
 
         public TReturn Resolve<TReturn>(Func<TReturn> success, Func<ResultFlag, TReturn> failed) => HasFailed() ? failed(Status) : success();
         public TReturn Resolve<TReturn>(Func<TReturn> success, TReturn @default) => HasFailed() ? @default : success();
-        public bool Catch(Action<ResultFlag> operation)
-        {
+        public bool Catch(Action<ResultFlag> operation){
             if (HasFailed()) operation(Status);
             return HasFailed();
         }

@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using Ametrin.Utils.Optional;
 
 namespace Ametrin.Utils.Registry{
     public sealed class TypeRegistry<TKey> : Registry<TKey, Type> where TKey : notnull{
@@ -12,6 +13,6 @@ namespace Ametrin.Utils.Registry{
         public MutableTypeRegistry() {}
         public MutableTypeRegistry(IDictionary<TKey, Type> entries) : base(entries) {}
 
-        public Result TryRegister<TType>(TKey key) => TryRegister(key, typeof(TType));
+        public ResultFlag TryRegister<TType>(TKey key) => TryRegister(key, typeof(TType));
     }
 }

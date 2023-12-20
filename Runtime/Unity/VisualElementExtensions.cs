@@ -21,11 +21,11 @@ namespace Ametrin.Utils.Unity{
         }
         
         public static void BorderRadius(this IStyle style, float value) => style.BorderRadius(value, value, value, value);
-        public static void BorderRadius(this IStyle style, float left, float top, float right, float bottom){
-            style.borderTopLeftRadius = left;
-            style.borderTopRightRadius = top;
-            style.borderBottomLeftRadius = bottom;
-            style.borderBottomRightRadius = right;
+        public static void BorderRadius(this IStyle style, float topLeft, float topRight, float bottomRight, float bottomLeft){
+            style.borderTopLeftRadius = topLeft;
+            style.borderTopRightRadius = topRight;
+            style.borderBottomLeftRadius = bottomLeft;
+            style.borderBottomRightRadius = bottomRight;
         }
         
         public static void Anchor(this IStyle style, float left, float top, float right, float bottom){

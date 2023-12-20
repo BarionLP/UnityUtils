@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Ametrin.Utils.Optional;
 
 namespace Ametrin.Utils.Registry{
     public class MutableRegistry<TKey, TValue> : IMutableRegistry<TKey, TValue> where TKey : notnull {
@@ -22,20 +23,21 @@ namespace Ametrin.Utils.Registry{
         }
         public MutableRegistry() : this(new Dictionary<TKey, TValue>()){}
 
-        public Result<TValue> TryGet(TKey key){
+        public Option<TValue> TryGet(TKey key){
             if (Entries.TryGetValue(key, out var value)){
                 return value;
             }
-            return ResultFlag.Null;
+            return Option<TValue>.None();
         }
 
-        public Result TryRegister(TKey key, TValue value){
+        public ResultFlag TryRegister(TKey key, TValue value){
             if (Entries.TryAdd(key, value)){
                 return ResultFlag.Succeeded;
             }
 
             return ResultFlag.AlreadyExists;
         }
+        public bool ContainsKey(TKey key) => Entries.ContainsKey(key);
 
         public IEnumerator<TValue> GetEnumerator() => Entries.Values.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)Entries).GetEnumerator();

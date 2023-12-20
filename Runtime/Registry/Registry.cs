@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Collections;
+using Ametrin.Utils.Optional;
 
 namespace Ametrin.Utils.Registry{
     public class Registry<TKey, TValue> : IRegistry<TKey, TValue> where TKey : notnull {
@@ -15,12 +16,13 @@ namespace Ametrin.Utils.Registry{
         }
         public Registry(IEnumerable<TValue> values, Func<TValue, TKey> keyProvider) : this(values.ToDictionary(keyProvider)){}
 
-        public Result<TValue> TryGet(TKey key){
+        public Option<TValue> TryGet(TKey key){
             if (Entries.TryGetValue(key, out var value)){
                 return value;
             }
-            return ResultFlag.Null;
+            return Option<TValue>.None();
         }
+        public bool ContainsKey(TKey key) => Entries.ContainsKey(key);
 
         public IEnumerator<TValue> GetEnumerator() => Entries.Values.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

@@ -15,11 +15,11 @@ namespace Ametrin.Utils.Unity{
         }
     }
     public static class PhysicsExtensions{
-        public static ValueOption<RaycastHit> Raycast(Vector3 position, Vector3 direction, float maxDistance, int layerMask){
+        public static Option<RaycastHit> Raycast(Vector3 position, Vector3 direction, float maxDistance, int layerMask){
             if (Physics.Raycast(position, direction, out var hit, maxDistance, layerMask)){
-                return ValueOption<RaycastHit>.Some(hit);
+                return Option<RaycastHit>.Some(hit);
             }
-            return ValueOption<RaycastHit>.None();
+            return Option<RaycastHit>.None();
         }
     }
 }

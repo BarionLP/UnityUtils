@@ -15,5 +15,9 @@ namespace Ametrin.Utils{
         public static string NameWithoutExtension(this FileInfo fileInfo) {
             return Path.GetFileNameWithoutExtension(fileInfo.FullName);
         }
+
+        public static void CopyTo(this FileInfo mainFile, FileInfo newFile, bool overwrite = false) {
+            mainFile.CopyTo(newFile.FullName, overwrite);
+        }
     }
 }

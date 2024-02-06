@@ -23,7 +23,7 @@ namespace Ametrin.Utils{
             return @default;
         }
         public static TValue GetOrCreate<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key) where TValue : new(){
-            if (!dict.TryGetValue(key, out TValue val)){
+            if (!dict.TryGetValue(key, out var val)){
                 val = new TValue();
                 dict.Add(key, val);
             }

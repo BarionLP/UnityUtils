@@ -14,6 +14,7 @@ namespace Ametrin.Utils.Registry{
         public Registry(IReadOnlyDictionary<TKey, TValue> entries) {
             Entries = entries;
         }
+        public Registry(IEnumerable<KeyValuePair<TKey, TValue>> entries) : this(entries.ToDictionary()) { }
         public Registry(IEnumerable<TValue> values, Func<TValue, TKey> keyProvider) : this(values.ToDictionary(keyProvider)){}
 
         public Option<TValue> TryGet(TKey key){

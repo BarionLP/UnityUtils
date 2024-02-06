@@ -18,6 +18,7 @@ namespace Ametrin.Utils.Registry{
         }
 
         public MutableRegistry(IEnumerable<TValue> values, Func<TValue, TKey> keyProvider) : this(values.ToDictionary(keyProvider)) { }
+        public MutableRegistry(IEnumerable<KeyValuePair<TKey, TValue>> entries) : this(entries.ToDictionary()) { }
         public MutableRegistry(IDictionary<TKey, TValue> entries){
             Entries = entries;
         }

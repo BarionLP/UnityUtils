@@ -15,7 +15,7 @@ namespace Ametrin.Utils.Optional{
             return new(ResultFlag.Succeeded, value);
         }
         public static Result<T> Failed(ResultFlag status = ResultFlag.Failed){
-            if (status is ResultFlag.Succeeded) throw new ArgumentException("Cannot Succeed without value! Use Result.Succeeded", nameof(status));
+            if (status.IsSuccess()) throw new ArgumentException("Cannot Succeed without value! Use Result.Of", nameof(status));
             return new(status, default);
         }
 
@@ -31,10 +31,10 @@ namespace Ametrin.Utils.Optional{
             success(Value!);
         }
 
-        public readonly Result<TResult> Map<TResult>(Func<T, TResult> map) => HasFailed ? Result<TResult>.Failed(Status) : map(Value!);
-        public readonly Result<TResult> Map<TResult>(Func<T, Result<TResult>> map) => HasFailed ? Result<TResult>.Failed(Status) : map(Value!);
-        public readonly Result<TResult> Map<TResult>(Func<T, Option<TResult>> map) => HasFailed ? Result<TResult>.Failed(Status) : map(Value!).ToResult(Status);
-        public readonly Result<TResult> Map<TResult>(Func<T, TResult> map, Func<ResultFlag, TResult> error) => HasFailed ? error(Status) : map(Value!);
+        public readonly Result<TResult> Map<TResult>(Func<T, TResult> map) => IsSuccess ? map(Value!) : Result<TResult>.Failed(Status);
+        public readonly Result<TResult> Map<TResult>(Func<T, Result<TResult>> map) => IsSuccess ? map(Value!) : Result<TResult>.Failed(Status);
+        public readonly Result<TResult> Map<TResult>(Func<T, Option<TResult>> map) => IsSuccess ? map(Value!).ToResult(Status) : Result<TResult>.Failed(Status);
+        public readonly Result<TResult> Map<TResult>(Func<T, TResult> map, Func<ResultFlag, TResult> error) => IsSuccess ? map(Value!) : error(Status);
 
         public T Reduce(Func<ResultFlag, T> operation) => IsSuccess ? Value! : operation(Status);
         public T Reduce(Func<T> operation) => IsSuccess ? Value! : operation();

@@ -12,6 +12,14 @@ namespace Ametrin.Utils{
             return new(directoryInfo.FullName + " - Copy");
         }
 
+        public static void CreateIfNotExists(this DirectoryInfo directoryInfo) {
+            if (!directoryInfo.Exists) {
+                directoryInfo.Create();
+            }
+        }
+
+        public static FileInfo File(this DirectoryInfo directoryInfo, string fileName) => new(Path.Combine(directoryInfo.FullName, fileName));
+
         public static void ForeachFile(this DirectoryInfo directoryInfo, Action<FileInfo> action, IProgress<(float, string)> progress, SearchOption searchOption = SearchOption.AllDirectories, string pattern = "*"){
             if (progress is null){
                 directoryInfo.ForeachFile(action);

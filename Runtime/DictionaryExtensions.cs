@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Ametrin.Utils.Optional;
 
 namespace Ametrin.Utils{
     #nullable enable
@@ -14,6 +15,13 @@ namespace Ametrin.Utils{
 
             result = default!;
             return false;
+        }
+
+        public static Option<TValue> Get<TValue, TKey>(this IReadOnlyDictionary<TKey, TValue> dic, TKey key) {
+            if (dic.TryGetValue(key, out var res)){
+                return res;
+            }
+            return Option<TValue>.None();
         }
 
         public static TValue GetOrCreate<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, TValue @default){

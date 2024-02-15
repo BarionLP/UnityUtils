@@ -8,10 +8,8 @@ namespace Ametrin.Utils{
 
         public static RangeEnumerator GetEnumerator(this Range range) => new(range);
 
-        public ref struct RangeEnumerator{
-            //INCLUDES THE LAST NUMBER
-            //DO NOT CHANGE
-            //questionable decision, but now it's to late
+        public struct RangeEnumerator{
+            // start INCLUSIVE - end EXCLUSIVE
             private int _current;
             private readonly int _end;
             public readonly int Current => _current;

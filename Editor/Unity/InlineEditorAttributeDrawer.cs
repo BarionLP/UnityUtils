@@ -3,9 +3,11 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Ametrin.Utils.Unity.EditorTools{
+namespace Ametrin.Utils.Unity.EditorTools
+{
     [CustomPropertyDrawer(typeof(InlineEditorAttribute), true)]
-    public sealed class InlineEditorAttributeDrawer : PropertyDrawer{
+    public sealed class InlineEditorAttributeDrawer : PropertyDrawer
+    {
         private readonly static StyleColor BackgroundColor = new Color(0, 0, 0, 0.1f);
         private readonly static StyleColor CollapsedBackgroundColor = new Color(0, 0, 0, 0);
 
@@ -14,14 +16,15 @@ namespace Ametrin.Utils.Unity.EditorTools{
         private Foldout EditorFoldout;
         private VisualElement InlinedEditor;
         private SerializedProperty Property;
-        
-        public override VisualElement CreatePropertyGUI(SerializedProperty property){
+
+        public override VisualElement CreatePropertyGUI(SerializedProperty property)
+        {
             Property = property;
             Root = new VisualElement();
             Root.style.BorderRadius(5);
             Root.style.paddingBottom = EditorGUIUtility.standardVerticalSpacing;
 
-            CreateFoldout();            
+            CreateFoldout();
             CreatePropertyField();
 
             RefreshUI();
@@ -29,8 +32,10 @@ namespace Ametrin.Utils.Unity.EditorTools{
             return Root;
         }
 
-        private void CreateFoldout(){
-            EditorFoldout = new(){
+        private void CreateFoldout()
+        {
+            EditorFoldout = new()
+            {
                 value = false
             };
             EditorFoldout.RegisterValueChangedCallback(OnFoldoutChanged);
@@ -39,26 +44,32 @@ namespace Ametrin.Utils.Unity.EditorTools{
             Root.Add(EditorFoldout);
         }
 
-        private void CreatePropertyField(){
+        private void CreatePropertyField()
+        {
             PropertyField = new(Property);
             PropertyField.style.alignContent = Align.Center;
             PropertyField.style.top = 0;
             PropertyField.style.right = 0;
-            PropertyField.RegisterValueChangeCallback(evt =>{
+            PropertyField.RegisterValueChangeCallback(evt =>
+            {
                 evt.StopImmediatePropagation();
                 RefreshUI();
             });
             Root.Add(PropertyField);
         }
 
-        private void RefreshUI(){
+        private void RefreshUI()
+        {
             var obj = Property.objectReferenceValue;
-            if(obj != null){
+            if (obj != null)
+            {
                 PropertyField.style.position = Position.Absolute;
                 PropertyField.style.left = 15;
                 EditorFoldout.SetEnabled(true);
                 EditorFoldout.style.display = DisplayStyle.Flex;
-            }else{
+            }
+            else
+            {
                 EditorFoldout.Clear();
                 EditorFoldout.style.display = DisplayStyle.None;
                 EditorFoldout.SetEnabled(false);
@@ -68,13 +79,17 @@ namespace Ametrin.Utils.Unity.EditorTools{
             }
         }
 
-        private void BuildEditor(){
+        private void BuildEditor()
+        {
             var editor = Editor.CreateEditor(Property.objectReferenceValue);
             var rootier = Root.GetFirstAncestorOfType<Foldout>()?.GetFirstAncestorOfType<Foldout>();
-            if(rootier == null){
+            if (rootier == null)
+            {
                 InlinedEditor = editor.CreateInspectorGUI();
                 InlinedEditor.Bind(new(Property.objectReferenceValue));
-            } else{
+            }
+            else
+            {
                 var imGUIContainer = new IMGUIContainer(editor.OnInspectorGUI);
                 InlinedEditor = imGUIContainer;
             }
@@ -82,21 +97,25 @@ namespace Ametrin.Utils.Unity.EditorTools{
             EditorFoldout.Add(InlinedEditor);
         }
 
-        private void OnFoldoutChanged(ChangeEvent<bool> evt){
+        private void OnFoldoutChanged(ChangeEvent<bool> evt)
+        {
             evt.StopImmediatePropagation();
-            if(InlinedEditor == null && Root.parent != null){
+            if (InlinedEditor == null && Root.parent != null)
+            {
                 BuildEditor();
             }
-            
+
             UpdateRootColor();
         }
 
-        private void UpdateRootColor(){
+        private void UpdateRootColor()
+        {
             Root.style.backgroundColor = EditorFoldout.value ? BackgroundColor : CollapsedBackgroundColor;
         }
 
         //IMGUI compat, used when nesting to deep
-        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label){
+        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+        {
             EditorGUI.BeginProperty(position, label, property);
             EditorGUI.PropertyField(position, property, label);
             EditorGUI.EndProperty();

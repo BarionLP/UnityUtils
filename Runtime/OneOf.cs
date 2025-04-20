@@ -1,6 +1,7 @@
 ﻿using System;
 
-namespace Ametrin.Utils{
+namespace Ametrin.Utils
+{
     public sealed class OneOf<T1, T2>
     {
         private readonly object Value;
@@ -37,7 +38,8 @@ namespace Ametrin.Utils{
 
                 default:
                     throw new InvalidOperationException($"Unexpected type! must be {nameof(T1)} or {nameof(T2)}");
-            };
+            }
+            ;
         }
 
 

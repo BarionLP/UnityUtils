@@ -1,7 +1,9 @@
 using UnityEngine;
 
-namespace Ametrin.Utils.Unity{
-    public static class VectorExtensions{
+namespace Ametrin.Utils.Unity
+{
+    public static class VectorExtensions
+    {
         public static Vector3 AtX(this Vector3 vector3, float x) => new(x, vector3.y, vector3.z);
         public static Vector3 AtY(this Vector3 vector3, float y) => new(vector3.x, y, vector3.z);
         public static Vector3 AtZ(this Vector3 vector3, float z) => new(vector3.x, vector3.y, z);

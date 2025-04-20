@@ -1,13 +1,16 @@
 using System;
 
-namespace Ametrin.Utils.Optional{
+namespace Ametrin.Utils.Optional
+{
     // based on https://github.com/zoran-horvat/optional
     // #nullable enable
-    public readonly struct Option<T> : IEquatable<Option<T>>{
+    public readonly struct Option<T> : IEquatable<Option<T>>
+    {
         private readonly T _content;
         public bool HasValue { get; }
 
-        private Option(T content, bool hasValue){
+        private Option(T content, bool hasValue)
+        {
             _content = content;
             HasValue = hasValue;
         }
@@ -20,8 +23,10 @@ namespace Ametrin.Utils.Optional{
         public readonly Option<TResult> Map<TResult>(Func<T, Option<TResult>> map) => HasValue ? map(_content) : Option<TResult>.None();
         public readonly Result<TResult> Map<TResult>(Func<T, Result<TResult>> map, ResultFlag defaultFlag = ResultFlag.Failed) => HasValue ? map(_content) : Result<TResult>.Failed(defaultFlag);
 
-        public readonly Option<TResult> Cast<TResult>(){
-            if (HasValue && _content is TResult castedContent){
+        public readonly Option<TResult> Cast<TResult>()
+        {
+            if (HasValue && _content is TResult castedContent)
+            {
                 return Option<TResult>.Some(castedContent);
             }
             return Option<TResult>.None();
@@ -35,8 +40,10 @@ namespace Ametrin.Utils.Optional{
         public readonly Option<T> Where(Func<T, bool> predicate) => HasValue && predicate(_content) ? this : None();
         public readonly Option<T> WhereNot(Func<T, bool> predicate) => HasValue && !predicate(_content) ? this : None();
 
-        public readonly void Resolve(Action<T> success, Action failed = null){
-            if (!HasValue){
+        public readonly void Resolve(Action<T> success, Action failed = null)
+        {
+            if (!HasValue)
+            {
                 failed?.Invoke();
                 return;
             }
@@ -48,9 +55,12 @@ namespace Ametrin.Utils.Optional{
 
         public override readonly int GetHashCode() => HasValue ? _content!.GetHashCode() : 0;
         public override readonly bool Equals(object other) => other is Option<T> option && Equals(option);
-        public readonly bool Equals(Option<T> other){
-            if (HasValue){
-                if (other.HasValue){
+        public readonly bool Equals(Option<T> other)
+        {
+            if (HasValue)
+            {
+                if (other.HasValue)
+                {
                     return _content!.Equals(other._content);
                 }
                 return false;
